@@ -27,7 +27,7 @@ jobs:
       # 5. Copy index.html to appropriate directory
       - name: Copy index.html to Apache web root
         run: |
-          # Ensuring the file exists before copying to avoid errors
+          - Ensuring the file exists before copying to avoid errors
           if [ -f index.html ]; then
             sudo cp index.html /var/www/html/index.html
           else
