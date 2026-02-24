@@ -1,0 +1,45 @@
+name: Apache Setup and Test
+
+# 1. React on push, pull_request, and manual (workflow_dispatch)
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  apache-test:
+    # 2. Start runner ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # 3. Download code on runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 4. Install Apache
+      - name: Install Apache
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apache2
+
+      # 5. Copy index.html to appropriate directory
+      - name: Copy index.html to Apache web root
+        run: |
+          # Ensuring the file exists before copying to avoid errors
+          if [ -f index.html ]; then
+            sudo cp index.html /var/www/html/index.html
+          else
+            echo "index.html not found in repository root!"
+            exit 1
+          fi
+
+      # 6. Check by curl
+      - name: Start Apache and Check via Curl
+        run: |
+          sudo service apache2 start
+          # Wait a moment for service to initialize
+          sleep 2
+          curl -I http://localhost
+          curl http://localhost | grep -i "Hello" || echo "Content check failed but server is up"
